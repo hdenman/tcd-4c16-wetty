@@ -37,6 +37,10 @@ var opts = require('optimist')
             alias: 'p',
             description: 'wetty listen port'
         },
+        autouser: {
+            demand: false,
+            description: 'user to auto-login'
+        },
     }).boolean('allow_discovery').argv;
 
 var runhttps = false;
@@ -44,6 +48,7 @@ var sshport = 22;
 var sshhost = 'localhost';
 var sshauth = 'password';
 var globalsshuser = '';
+var autouser = '';
 
 if (opts.sshport) {
     sshport = opts.sshport;
@@ -59,6 +64,10 @@ if (opts.sshauth) {
 
 if (opts.sshuser) {
     globalsshuser = opts.sshuser;
+}
+
+if (opts.autouser) {
+    autouser = opts.autouser;
 }
 
 if (opts.sslkey && opts.sslcert) {
@@ -103,7 +112,9 @@ io.on('connection', function(socket){
 
     var term;
     if (process.getuid() == 0) {
-        term = pty.spawn('/bin/login', [], {
+      login_opts = [];
+      if (autouser) login_opts.push('-f', autouser);
+      term = pty.spawn('/bin/login', login_opts, {
             name: 'xterm-256color',
             cols: 80,
             rows: 30
