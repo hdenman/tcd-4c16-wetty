@@ -6,6 +6,8 @@ var server = require('socket.io');
 var pty = require('pty.js');
 var fs = require('fs');
 
+var Throttle = require('stream-throttle').Throttle;
+
 var opts = require('optimist')
     .options({
         sslkey: {
@@ -127,9 +129,15 @@ io.on('connection', function(socket){
         });
     }
     console.log((new Date()) + " PID=" + term.pid + " STARTED on behalf of user=" + sshuser)
-    term.on('data', function(data) {
-        socket.emit('output', data);
+
+    var t_opts = {rate: 1024, decodeStrings: false};  // in bytes / sec
+    var throttle = new Throttle(t_opts);
+    term.pipe(throttle);
+
+    throttle.on('data', function(data) {
+      socket.emit('output', data.toString('binary'));
     });
+
     term.on('exit', function(code) {
         console.log((new Date()) + " PID=" + term.pid + " ENDED")
     });
