@@ -1,5 +1,7 @@
 docker build -t tcd-wetty .
 docker save tcd-wetty | gzip > tcd-wetty.docker-image.tar.gz
-gsutil cp ./tcd-wetty.docker-image.tar.gz  gs://tcd-4c16-web/
-gsutil acl ch -u AllUsers:R gs://tcd-4c16-web/tcd-wetty.docker-image.tar.gz
+
+gcloud auth login
+gsutil cp ./tcd-wetty.docker-image.tar.gz  gs://tcd-4c16-system/
+gsutil acl ch -u AllUsers:R gs://tcd-4c16-system/tcd-wetty.docker-image.tar.gz
 rm tcd-wetty.docker-image.tar.gz
