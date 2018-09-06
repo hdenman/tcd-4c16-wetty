@@ -130,7 +130,7 @@ io.on('connection', function(socket){
     }
     console.log((new Date()) + " PID=" + term.pid + " STARTED on behalf of user=" + sshuser)
 
-    var t_opts = {rate: 1024, decodeStrings: false};  // in bytes / sec
+    var t_opts = {rate: 10240, decodeStrings: false};  // in bytes / sec
     var throttle = new Throttle(t_opts);
     term.pipe(throttle);
 
